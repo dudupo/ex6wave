@@ -159,16 +159,30 @@ def merge(wave_seq1 , wave_seq2):
 
 
 def getinput_and_call(_function , argslen):
-    print("i was here")
     args = [input() for _ in range(argslen)]
-    print("i was here")
+    return _function(*args)
 
-    open("log.txt" , 'a+').write("-" * 20 + '\n'  + str( _function(*args)))
-
-def proxy(_function):
+def proxy(_function , load_wave=load_wave):
     return  lambda : getinput_and_call(
      lambda _path :
       _function( load_wave(_path)) , 1)
+
+MESSAGE_MEREGE_INTERFACE = "enter files"
+def merge_user_interface():
+    print(MESSAGE_MEREGE_INTERFACE)
+    wave_seqs = [load_wave(input())[1] for _ in range(2)]
+    return merge( *wave_seqs  )
+
+
+def save(  ):
+
+
+SAVEMENU = {
+    0 : (" do you want to save the file ?" ,    None                  ),
+    1 : ("yes : "  ,  save                      proxy(slow           )),
+    2 : ("no  : " ,                             proxy(dimming_filter ))
+}
+
 
 EDITMENU = {
     0 : ("blabla" , None),
@@ -178,11 +192,16 @@ EDITMENU = {
     4 : ("slow : "  ,               proxy(slow             )) ,
     5 : ("dimming_filter : " ,      proxy(dimming_filter   )) ,
     6 : ("inversion : "      ,      proxy(inversion        ))
-
 }
+
+
+
 MAINMENU = {
     0 : ("choose opthion", None),
-    1 : ( "change wave file" , lambda : menu(EDITMENU) )
+    1 : ( "change wave file" , lambda : menu(EDITMENU) ),
+    2 : ( "merges wave files" , merge_user_interface ),
+    3 : ( "compose wave files" , lambda : proxy( composite_txt_file )),
+    4 : ( "exit" , lambda : print( "goodbye" ) )
 
 }
 
