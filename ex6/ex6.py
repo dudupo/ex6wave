@@ -130,16 +130,31 @@ def sample_rate_i(i, frequency):
 
 
 def composite_txt_file(filename):
-    openfile = open(filename, 'r').read()
-    notes_list = list()
-    for i , note in enumerate(openfile.split()):
-        if i%2 == 0:
-            notes_list.append([])
-        notes_list[-1].append(note)
-    return notes_list
 
+    def load_wave_seq(filename):
+        openfile = open(filename, 'r').read()
+        notes_list = list()
+        for i , note in enumerate(openfile.split()):
+            if i%2 == 0:
+                notes_list.append([])
+            notes_list[-1].append(note)
+        return notes_list
 
+    for ( note_char , ticks) in load_wave_seq(filename):
+        note = NOTES[note_char]
+        return [ [sample_rate_i( i , note )] * 2
+        for i in range( int(ticks) * 125) ]
 
+def merge(wave_seq1 , wave_seq2):
+    if len(wave_seq1) > len(wave_seq2):
+        return merge( wave_seq2, wave_seq1 )
+    ret = [ ]
+    wave_seq1 += deepcopy(wave_seq2[len(wave_seq1):])
+    for waves_tuple1 , waves_tuple2  in zip(wave_seq1 ,wave_seq2 ):
+        ret.append([])
+        for x , y in zip(  waves_tuple1 , waves_tuple2 ):
+            ret[-1].append( (x + y) / 2  )
+    return normal( ret )
 
 
 if __name__ == '__main__':
@@ -153,13 +168,9 @@ if __name__ == '__main__':
     a, b = dimming_filter(D)
     print(b)
 
+    a = composite_txt_file('tt1.txt')
+    b = composite_txt_file('tt2.txt')
+    print( merge(a , b ))
+
 
     #save_wave(a, b, 'dimmed.wav')
-    for ( x , y) in composite_txt_file('tt1.txt'):
-        note = NOTES[x]
-        _sum = 0
-        for i in range( int(y) * 125):
-            _sum = sample_rate_i( i , note )
-            print(_sum , end= " ")
-
-        print(_sum, end=" ")
