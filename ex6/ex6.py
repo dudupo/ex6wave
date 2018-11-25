@@ -88,6 +88,7 @@ def dimming_filter(wave_data):
 def stretch_volume(wave_data, factor):
     _ , wave_seq = wave_data
     ret_seq , pair = [ ] , []
+    print(" i was here 3")
     for wave in wave_seq_gen(wave_seq) :
         if len( pair ) == 2 :
             ret_seq.append(  pair  )
@@ -157,20 +158,61 @@ def merge(wave_seq1 , wave_seq2):
     return normal( ret )
 
 
+def getinput_and_call(_function , argslen):
+    print("i was here")
+    args = [input() for _ in range(argslen)]
+    print("i was here")
+
+    open("log.txt" , 'a+').write("-" * 20 + '\n'  + str( _function(*args)))
+
+def proxy(_function):
+    return  lambda : getinput_and_call(
+     lambda _path :
+      _function( load_wave(_path)) , 1)
+
+EDITMENU = {
+    0 : ("blabla" , None),
+    1 : ("increase_volume : "  ,    proxy(increase_volume  )) ,
+    2 : ("decrease_volume : " ,     proxy(decrease_volume  )) ,
+    3 : ("accelerate " ,            proxy(acceleration     )) ,
+    4 : ("slow : "  ,               proxy(slow             )) ,
+    5 : ("dimming_filter : " ,      proxy(dimming_filter   )) ,
+    6 : ("inversion : "      ,      proxy(inversion        ))
+
+}
+MAINMENU = {
+    0 : ("choose opthion", None),
+    1 : ( "change wave file" , lambda : menu(EDITMENU) )
+
+}
+
+
+def menu( _menu ):
+    print (_menu[0][0])
+    for opthion , ( message , _function ) in _menu.items():
+        if opthion :
+            print( str(opthion) + "." + message )
+
+    _menu[int(input())][1]()
+
+    pass
+
 if __name__ == '__main__':
-    D = load_wave( "./wav Samples/batman_theme_x.wav")
-    #print(list(D))
-    print(D[1][0])
-    D = increase_volume(D)
-    print(D[1][0])
+    # D = load_wave( "./wav Samples/batman_theme_x.wav")
+    # #print(list(D))
+    # print(D[1][0])
+    # D = increase_volume(D)
+    # print(D[1][0])
+    #
+    # D = [ 0 , [ [ i ,  i ] for i in range(10)] ]
+    # a, b = dimming_filter(D)
+    # print(b)
+    #
+    # a = composite_txt_file('tt1.txt')
+    # b = composite_txt_file('tt2.txt')
+    # print( merge(a , b ))
 
-    D = [ 0 , [ [ i ,  i ] for i in range(10)] ]
-    a, b = dimming_filter(D)
-    print(b)
 
-    a = composite_txt_file('tt1.txt')
-    b = composite_txt_file('tt2.txt')
-    print( merge(a , b ))
-
+    menu( MAINMENU )
 
     #save_wave(a, b, 'dimmed.wav')
