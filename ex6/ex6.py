@@ -160,7 +160,8 @@ def merge(wave_seq1 , wave_seq2):
 
 def getinput_and_call(_function , argslen):
     args = [input() for _ in range(argslen)]
-    return _function(*args)
+    resoult = _function(*args)
+    menu(SAVEMENU , params=resoult)
 
 def proxy(_function , load_wave=load_wave):
     return  lambda : getinput_and_call(
@@ -175,7 +176,7 @@ def merge_user_interface():
 
 
 def save(  ):
-
+    menu(SAVEMENU)
 
 SAVEMENU = {
     0 : (" do you want to save the file ?" ,    None                  ),
@@ -206,13 +207,15 @@ MAINMENU = {
 }
 
 
-def menu( _menu ):
+def menu( _menu , params=None ):
     print (_menu[0][0])
     for opthion , ( message , _function ) in _menu.items():
         if opthion :
             print( str(opthion) + "." + message )
-
-    _menu[int(input())][1]()
+    if params not None:
+        _menu[int(input())][1](params)
+    else :    
+        _menu[int(input())][1]()
 
     pass
 
