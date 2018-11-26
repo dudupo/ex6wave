@@ -6,6 +6,24 @@
 # wav Samples\batman_theme_x.wav" | python ./ex6.py
 # done
 
-echo "2
+echo "1
+4
 wav Samples\batman_theme_x.wav
-wav Samples\seinfeld.wav" | python ./ex6.py
+1
+test.wav
+1
+4
+test.wav
+1
+test2.wav
+4" | python ./ex6.py
+
+echo "1
+4
+wav Samples\batman_theme_x.wav
+2
+1
+4
+1
+test.wav
+4" | python ./ex6.py
