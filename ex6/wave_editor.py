@@ -255,9 +255,11 @@ def getinput_and_call(_function , argslen):
         than calling to a function,
         finaly sending the user for the 'saving menue'
     '''
-    args = [input() for _ in range(argslen)]
-    resoult = _function(*args)
-    GLOBAL_CURRENT_SEQ = resoult
+    if argslen == 0:
+        resoult = _function(GLOBAL_CURRENT_SEQ)
+    else :
+        args = [input() for _ in range(argslen)]
+        resoult = _function(*args)
     menu(SAVEMENU , params=resoult)
 
 def proxy(_function , load_wave=load_wave):
@@ -266,13 +268,16 @@ def proxy(_function , load_wave=load_wave):
         it is allows me to convert the function
         f(X , Y)  to g(Y) when i know what is X.
     '''
-    # GLOBAL_CURRENT_SEQ = None is -
-    # - the case which we hadn`t loaded a wav file yet
-    return lambda : getinput_and_call(
-     lambda _path :
-     _function( load_wave(_path)) , ONEPARAMETE) \
-       if GLOBAL_CURRENT_SEQ is None \
-         else lambda : getinput_and_call(_function(GLOBAL_CURRENT_SEQ) , 0)
+    def _proxy():
+        global GLOBAL_CURRENT_SEQ
+        if GLOBAL_CURRENT_SEQ is None:
+            return getinput_and_call(
+             lambda _path :
+              _function( load_wave(_path)) , ONEPARAMETE)
+        else :
+            # the case which we allready have choose a file.
+            return getinput_and_call( _function , 0)
+    return _proxy
 
 
 def merge_user_interface():
@@ -288,10 +293,21 @@ def save_file(resoult):
     '''
         saving wave sequance as file.
     '''
-    _file_name = input(MESSAGE_SAVE_INTERFACE)
+    print(MESSAGE_SAVE_INTERFACE)
+    _file_name = input()
     frame_rate , wave_seq = resoult
     save_wave( frame_rate , wave_seq , _file_name)
+
+    global GLOBAL_CURRENT_SEQ
+    GLOBAL_CURRENT_SEQ = None
+
     menu(MAINMENU)
+
+def not_save(resoult):
+    global GLOBAL_CURRENT_SEQ
+    GLOBAL_CURRENT_SEQ = resoult
+    
+    menu( EDITMENU )
 
 #########################################################################
 #------------------------Menus------------------------------------------#
@@ -304,7 +320,7 @@ def save_file(resoult):
 SAVEMENU = {
     0 : (" do you want to save the file ?" ,    None                    ),
     1 : ("yes : "  ,                            save_file               ),
-    2 : ("no  : " ,                             lambda _ : menu(MAINMENU))
+    2 : ("no  : " ,                             not_save                )
 }
 
 
